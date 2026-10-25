@@ -8,6 +8,9 @@ export async function GET(request: Request) {
 
   const name = (searchParams.get("name") || "Discord User").slice(0, 32);
   const avatar = searchParams.get("avatar") || "";
+  const bio = (
+    searchParams.get("bio") || "Henüz biyografi eklenmedi"
+  ).slice(0, 90);
 
   const level = Math.max(0, Number(searchParams.get("level") || 1));
   const xp = Math.max(0, Number(searchParams.get("xp") || 0));
@@ -67,8 +70,6 @@ export async function GET(request: Request) {
     sethBanka: "https://cdn.discordapp.com/emojis/1328369378562932796.png?v=1&size=48&quality=lossless",
     xp: "https://cdn.discordapp.com/emojis/1355997317332734033.png?v=1&size=48&quality=lossless",
     level: "https://cdn.discordapp.com/emojis/1560926678723596379.png?v=1&size=48&quality=lossless",
-
-    // İstediğin yeni emojiler
     premium: "https://cdn.discordapp.com/emojis/1221870403153166436.png?v=1&size=48&quality=lossless",
     popularity: "https://cdn.discordapp.com/emojis/1221807792134946856.png?v=1&size=48&quality=lossless",
   };
@@ -95,13 +96,12 @@ export async function GET(request: Request) {
           width: "100%",
           height: "100%",
           padding: "15px",
+          boxSizing: "border-box",
           background: "#17151f",
           color: "#ffffff",
           fontFamily: "Arial",
-          position: "relative",
         }}
       >
-        {/* Banner dış çerçevesi */}
         <div
           style={{
             display: "flex",
@@ -111,34 +111,12 @@ export async function GET(request: Request) {
             border: "3px solid #836FFF",
             borderRadius: "22px",
             padding: "18px",
-            position: "relative",
             overflow: "hidden",
             background:
               "linear-gradient(135deg, #242033 0%, #17151f 55%, #211b35 100%)",
           }}
         >
-          {/* Büyük, şeffaf arka plan yazısı */}
-          <div
-            style={{
-              display: "flex",
-              position: "absolute",
-              left: "205px",
-              top: "105px",
-              width: "740px",
-              height: "150px",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "100px",
-              fontWeight: 900,
-              color: "#FFFFFF",
-              opacity: 0.075,
-              whiteSpace: "nowrap",
-            }}
-          >
-            (S) SETH
-          </div>
-
-          {/* SOL: Avatar ve kullanıcı bilgileri */}
+          {/* SOL: Avatar, isim, biyografi, Ranked, Point, Premium ve Level */}
           <div
             style={{
               display: "flex",
@@ -147,25 +125,24 @@ export async function GET(request: Request) {
               height: "100%",
               paddingRight: "16px",
               borderRight: "1px solid #514477",
-              position: "relative",
             }}
           >
-            {/* Avatar ve isim yan yana */}
+            {/* Avatar ve kullanıcı adı yan yana */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
                 gap: "14px",
-                minHeight: "135px",
+                minHeight: "125px",
               }}
             >
               {avatar.startsWith("https://") && (
                 <img
                   src={avatar}
-                  width="128"
-                  height="128"
+                  width="118"
+                  height="118"
                   style={{
-                    borderRadius: "64px",
+                    borderRadius: "59px",
                     border: "4px solid #836FFF",
                     objectFit: "cover",
                     flexShrink: 0,
@@ -187,30 +164,32 @@ export async function GET(request: Request) {
                     fontSize: "25px",
                     fontWeight: 800,
                     overflow: "hidden",
-                    color: "#FFFFFF",
                   }}
                 >
                   {name}
                 </div>
+
                 <div
                   style={{
                     display: "flex",
                     fontSize: "13px",
-                    color: "#B9ACFF",
-                    marginTop: "5px",
+                    color: "#C4B5FD",
+                    marginTop: "6px",
+                    overflow: "hidden",
+                    lineHeight: 1.4,
                   }}
                 >
-                  SETH PROFILE
+                  {bio}
                 </div>
               </div>
             </div>
 
-            {/* Ranked ve Point eş tasarımlı kutular */}
+            {/* Ranked ve Point kutuları */}
             <div
               style={{
                 display: "flex",
                 gap: "8px",
-                marginTop: "14px",
+                marginTop: "12px",
               }}
             >
               <div
@@ -218,6 +197,7 @@ export async function GET(request: Request) {
                   display: "flex",
                   flexDirection: "column",
                   flex: 1,
+                  minWidth: 0,
                   padding: "9px",
                   borderRadius: "11px",
                   background: "rgba(54, 50, 72, 0.92)",
@@ -252,6 +232,7 @@ export async function GET(request: Request) {
                   display: "flex",
                   flexDirection: "column",
                   flex: 1,
+                  minWidth: 0,
                   padding: "9px",
                   borderRadius: "11px",
                   background: "rgba(54, 50, 72, 0.92)",
@@ -281,13 +262,13 @@ export async function GET(request: Request) {
               </div>
             </div>
 
-            {/* Premium sadece aktifken görünür */}
+            {/* Premium kutusu */}
             {premiumActive && (
               <div
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  marginTop: "13px",
+                  marginTop: "12px",
                   padding: "10px",
                   borderRadius: "11px",
                   background: "rgba(54, 50, 72, 0.92)",
@@ -321,6 +302,7 @@ export async function GET(request: Request) {
                       {remaining <= 3600 ? "Premium ⚠️" : "Premium"}
                     </span>
                   </div>
+
                   <div
                     style={{
                       display: "flex",
@@ -355,20 +337,87 @@ export async function GET(request: Request) {
                 </div>
               </div>
             )}
+
+            {/* Level ve XP: Premium'un hemen altında */}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                marginTop: "10px",
+                padding: "10px",
+                borderRadius: "11px",
+                background: "rgba(54, 50, 72, 0.92)",
+                border: "1px solid #836FFF",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "6px",
+                  fontSize: "14px",
+                  fontWeight: 700,
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}
+                >
+                  <img src={emojis.level} width="22" height="22" />
+                  <span>Level {level}</span>
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}
+                >
+                  <img src={emojis.xp} width="22" height="22" />
+                  <span>{xp} / {next} XP</span>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  height: "10px",
+                  background: "#484456",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                  marginTop: "8px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    width: `${progress}%`,
+                    height: "10px",
+                    background: barColor,
+                    borderRadius: "8px",
+                  }}
+                />
+              </div>
+            </div>
           </div>
 
-          {/* SAĞ: Seth başlığı, ekonomi ve XP */}
+          {/* SAĞ: Seth ve ekonomi kutuları */}
           <div
             style={{
               display: "flex",
               flexDirection: "column",
               flex: 1,
+              minWidth: 0,
               height: "100%",
               paddingLeft: "18px",
-              position: "relative",
             }}
           >
-            {/* Seth başlığı */}
             <div
               style={{
                 display: "flex",
@@ -396,11 +445,14 @@ export async function GET(request: Request) {
               </div>
             </div>
 
-            {/* Ekonomi kutuları */}
             {[
               { label: "Seth", src: emojis.seth, value: seth },
               { label: "Yeth", src: emojis.yeth, value: yeth },
-              { label: "SethBanka", src: emojis.sethBanka, value: sethBanka },
+              {
+                label: "SethBanka",
+                src: emojis.sethBanka,
+                value: sethBanka,
+              },
               {
                 label: "Popülerlik",
                 src: emojis.popularity,
@@ -430,70 +482,6 @@ export async function GET(request: Request) {
                 </span>
               </div>
             ))}
-
-            {/* Level ve XP */}
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                marginTop: "auto",
-                paddingTop: "5px",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  fontSize: "15px",
-                  fontWeight: 700,
-                  gap: "8px",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "5px",
-                  }}
-                >
-                  <img src={emojis.level} width="21" height="21" />
-                  <span>Level {level}</span>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "5px",
-                  }}
-                >
-                  <img src={emojis.xp} width="21" height="21" />
-                  <span>{xp} / {next} XP</span>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  width: "100%",
-                  height: "10px",
-                  background: "#484456",
-                  borderRadius: "8px",
-                  overflow: "hidden",
-                  marginTop: "7px",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    width: `${progress}%`,
-                    height: "10px",
-                    background: barColor,
-                    borderRadius: "8px",
-                  }}
-                />
-              </div>
-            </div>
           </div>
         </div>
       </div>
