@@ -7,10 +7,28 @@ export async function GET(request: Request) {
 
   const name = (searchParams.get("name") || "Discord User").slice(0, 32);
   const avatar = searchParams.get("avatar") || "";
+
   const level = Math.max(0, Number(searchParams.get("level") || 1));
   const xp = Math.max(0, Number(searchParams.get("xp") || 0));
   const next = Math.max(1, Number(searchParams.get("next") || 100));
-  const progress = Math.min(100, Math.round((xp / next) * 100));
+
+  const seth = searchParams.get("seth") || "0";
+  const yeth = searchParams.get("yeth") || "0";
+  const sethBanka = searchParams.get("sethbanka") || "0";
+
+  const ranked = searchParams.get("ranked") || "Unranked";
+  const point = searchParams.get("point") || "0";
+  const premium = searchParams.get("premium") || "None";
+
+  const progress = Math.min(100, Math.max(0, Math.round((xp / next) * 100)));
+
+  // Level arttıkça barın rengi değişir
+  const barColor =
+    level >= 100 ? "#facc15" :
+    level >= 50 ? "#f97316" :
+    level >= 25 ? "#ef4444" :
+    level >= 10 ? "#3b82f6" :
+    "#836fff";
 
   const emojis = {
     logo: "https://cdn.discordapp.com/emojis/1363193225183105105.png?v=1&size=48&quality=lossless",
@@ -28,7 +46,7 @@ export async function GET(request: Request) {
           display: "flex",
           width: "100%",
           height: "100%",
-          padding: "24px",
+          padding: "20px",
           background: "#2b2d31",
           color: "#ffffff",
           fontFamily: "Arial",
@@ -40,30 +58,30 @@ export async function GET(request: Request) {
             width: "100%",
             height: "100%",
             border: "1px solid #41434a",
-            borderRadius: "20px",
-            padding: "24px",
+            borderRadius: "22px",
+            padding: "22px",
             alignItems: "center",
           }}
         >
-          {/* SOL TARAF: Avatar ve Level/XP */}
+          {/* SOL: Büyük avatar ve kullanıcı bilgileri */}
           <div
             style={{
               display: "flex",
               flexDirection: "column",
-              width: "43%",
+              width: "42%",
               height: "100%",
               justifyContent: "center",
-              paddingRight: "24px",
+              paddingRight: "22px",
             }}
           >
             {avatar.startsWith("https://") && (
               <img
                 src={avatar}
-                width="104"
-                height="104"
+                width="140"
+                height="140"
                 style={{
-                  borderRadius: "52px",
-                  border: "3px solid #836fff",
+                  borderRadius: "70px",
+                  border: "5px solid #836fff",
                   objectFit: "cover",
                 }}
               />
@@ -72,57 +90,59 @@ export async function GET(request: Request) {
             <div
               style={{
                 display: "flex",
-                fontSize: 24,
+                fontSize: 27,
                 fontWeight: 700,
-                marginTop: "10px",
+                marginTop: "12px",
                 maxWidth: "350px",
               }}
             >
               {name}
             </div>
 
+            {/* Ranked > Point */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                flexWrap: "wrap",
-                gap: "7px",
-                marginTop: "24px",
-                fontSize: 17,
+                gap: "8px",
+                marginTop: "12px",
+                fontSize: 19,
                 fontWeight: 600,
               }}
             >
-              <img src={emojis.level} width="22" height="22" />
-              <span>Level: {level}</span>
-              <span style={{ marginLeft: "4px" }}>|</span>
-              <img src={emojis.xp} width="22" height="22" />
-              <span>XP: {xp} / {next}</span>
+              <span>Ranked</span>
+              <span style={{ color: "#836fff" }}>&gt;</span>
+              <span>Point</span>
             </div>
 
             <div
               style={{
                 display: "flex",
-                width: "100%",
-                height: "10px",
-                background: "#484a53",
-                borderRadius: "8px",
-                overflow: "hidden",
-                marginTop: "10px",
+                fontSize: 18,
+                color: "#d1d5db",
+                marginTop: "5px",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  width: `${progress}%`,
-                  height: "10px",
-                  background: "#836fff",
-                  borderRadius: "8px",
-                }}
-              />
+              {ranked}  •  {point}
+            </div>
+
+            {/* Premium */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                marginTop: "12px",
+                fontSize: 18,
+                fontWeight: 600,
+              }}
+            >
+              <span style={{ color: "#c4b5fd" }}>Premium</span>
+              <span>{premium}</span>
             </div>
           </div>
 
-          {/* SAĞ TARAF: Seth logosu ve emojili liste */}
+          {/* SAĞ: Seth ve özel emoji listesi */}
           <div
             style={{
               display: "flex",
@@ -130,7 +150,7 @@ export async function GET(request: Request) {
               flex: 1,
               height: "100%",
               justifyContent: "center",
-              paddingLeft: "28px",
+              paddingLeft: "22px",
               borderLeft: "1px solid #41434a",
             }}
           >
@@ -140,16 +160,15 @@ export async function GET(request: Request) {
                 alignItems: "center",
                 justifyContent: "center",
                 gap: "12px",
-                marginBottom: "26px",
+                marginBottom: "15px",
               }}
             >
               <img
                 src={emojis.logo}
-                width="46"
-                height="46"
+                width="48"
+                height="48"
                 style={{ objectFit: "contain" }}
               />
-
               <div
                 style={{
                   display: "flex",
@@ -163,37 +182,94 @@ export async function GET(request: Request) {
             </div>
 
             {[
-              { label: "Seth", src: emojis.seth },
-              { label: "Yeth", src: emojis.yeth },
-              { label: "SethBanka", src: emojis.sethBanka },
+              { label: "Seth", src: emojis.seth, value: seth },
+              { label: "Yeth", src: emojis.yeth, value: yeth },
+              {
+                label: "SethBanka",
+                src: emojis.sethBanka,
+                value: sethBanka,
+              },
             ].map((item) => (
               <div
                 key={item.label}
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "16px",
-                  padding: "10px 16px",
-                  marginBottom: "10px",
-                  borderRadius: "12px",
+                  gap: "10px",
+                  padding: "8px 12px",
+                  marginBottom: "7px",
+                  borderRadius: "10px",
                   background: "#36383e",
-                  fontSize: 23,
+                  fontSize: 18,
                   fontWeight: 600,
                 }}
               >
                 <img
                   src={item.src}
-                  width="32"
-                  height="32"
+                  width="30"
+                  height="30"
                   style={{ objectFit: "contain" }}
                 />
-                <span>{item.label}</span>
+                <span>{item.label}:</span>
+                <span>{item.value}</span>
               </div>
             ))}
+
+            {/* EN SAĞ ALT: Level ve XP */}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                marginTop: "auto",
+                paddingTop: "8px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  fontSize: 16,
+                  fontWeight: 600,
+                  gap: "8px",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <img src={emojis.level} width="22" height="22" />
+                  <span>Level {level}</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <img src={emojis.xp} width="22" height="22" />
+                  <span>{xp} / {next} XP</span>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  height: "10px",
+                  background: "#484a53",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                  marginTop: "8px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    width: `${progress}%`,
+                    height: "10px",
+                    background: barColor,
+                    borderRadius: "8px",
+                  }}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
     ),
-    { width: 1000, height: 360 }
+    { width: 1000, height: 400 }
   );
 }
