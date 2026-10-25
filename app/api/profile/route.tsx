@@ -24,7 +24,6 @@ export async function GET(request: Request) {
   const ranked = searchParams.get("ranked") || "Unranked";
   const point = searchParams.get("point") || "0";
 
-  // Premium timestamp değerleri saniye cinsindendir.
   const premiumEnd = Number(searchParams.get("premium") || 0);
   const premiumStart = Number(searchParams.get("premiumstart") || 0);
   const now = Math.floor(Date.now() / 1000);
@@ -35,10 +34,7 @@ export async function GET(request: Request) {
 
   const premiumProgress =
     premiumActive && totalDuration > 0
-      ? Math.max(
-          0,
-          Math.min(100, (remaining / totalDuration) * 100)
-        )
+      ? Math.max(0, Math.min(100, (remaining / totalDuration) * 100))
       : 0;
 
   const formatDuration = (seconds: number) => {
@@ -86,6 +82,20 @@ export async function GET(request: Request) {
     fontSize: "17px",
     fontWeight: 600,
     minHeight: "40px",
+    boxSizing: "border-box",
+    minWidth: 0,
+  } as const;
+
+  const progressTrackStyle = {
+    display: "flex",
+    width: "100%",
+    minWidth: 0,
+    boxSizing: "border-box",
+    height: "10px",
+    background: "#484456",
+    borderRadius: "8px",
+    overflow: "hidden",
+    marginTop: "8px",
   } as const;
 
   return new ImageResponse(
@@ -116,33 +126,36 @@ export async function GET(request: Request) {
               "linear-gradient(135deg, #242033 0%, #17151f 55%, #211b35 100%)",
           }}
         >
-          {/* SOL: Avatar, isim, biyografi, Ranked, Point, Premium ve Level */}
+          {/* SOL: Profil bilgileri */}
           <div
             style={{
               display: "flex",
               flexDirection: "column",
               width: "43%",
               height: "100%",
+              minWidth: 0,
               paddingRight: "16px",
               borderRight: "1px solid #514477",
             }}
           >
-            {/* Avatar ve kullanıcı adı yan yana */}
+            {/* Avatar, kullanıcı adı ve biyografi */}
             <div
               style={{
                 display: "flex",
-                alignItems: "center",
-                gap: "14px",
-                minHeight: "125px",
+                alignItems: "flex-start",
+                gap: "12px",
+                minHeight: "115px",
+                paddingTop: "0px",
+                boxSizing: "border-box",
               }}
             >
               {avatar.startsWith("https://") && (
                 <img
                   src={avatar}
-                  width="118"
-                  height="118"
+                  width="108"
+                  height="108"
                   style={{
-                    borderRadius: "59px",
+                    borderRadius: "54px",
                     border: "4px solid #836FFF",
                     objectFit: "cover",
                     flexShrink: 0,
@@ -156,14 +169,18 @@ export async function GET(request: Request) {
                   flexDirection: "column",
                   flex: 1,
                   minWidth: 0,
+                  paddingTop: "0px",
                 }}
               >
                 <div
                   style={{
                     display: "flex",
-                    fontSize: "25px",
+                    fontSize: "24px",
                     fontWeight: 800,
+                    lineHeight: 1.15,
+                    maxWidth: "100%",
                     overflow: "hidden",
+                    overflowWrap: "anywhere",
                   }}
                 >
                   {name}
@@ -172,11 +189,14 @@ export async function GET(request: Request) {
                 <div
                   style={{
                     display: "flex",
-                    fontSize: "13px",
+                    fontSize: "14px",
                     color: "#C4B5FD",
-                    marginTop: "6px",
+                    marginTop: "5px",
+                    lineHeight: 1.5,
                     overflow: "hidden",
-                    lineHeight: 1.4,
+                    overflowWrap: "anywhere",
+                    wordBreak: "break-word",
+                    maxHeight: "126px",
                   }}
                 >
                   {bio}
@@ -184,12 +204,13 @@ export async function GET(request: Request) {
               </div>
             </div>
 
-            {/* Ranked ve Point kutuları */}
+            {/* Ranked ve Point */}
             <div
               style={{
                 display: "flex",
                 gap: "8px",
-                marginTop: "12px",
+                marginTop: "10px",
+                minWidth: 0,
               }}
             >
               <div
@@ -202,6 +223,7 @@ export async function GET(request: Request) {
                   borderRadius: "11px",
                   background: "rgba(54, 50, 72, 0.92)",
                   border: "1px solid #836FFF",
+                  boxSizing: "border-box",
                 }}
               >
                 <div
@@ -221,6 +243,7 @@ export async function GET(request: Request) {
                     fontWeight: 700,
                     marginTop: "5px",
                     overflow: "hidden",
+                    overflowWrap: "anywhere",
                   }}
                 >
                   {ranked}
@@ -237,6 +260,7 @@ export async function GET(request: Request) {
                   borderRadius: "11px",
                   background: "rgba(54, 50, 72, 0.92)",
                   border: "1px solid #836FFF",
+                  boxSizing: "border-box",
                 }}
               >
                 <div
@@ -255,6 +279,7 @@ export async function GET(request: Request) {
                     fontSize: "17px",
                     fontWeight: 700,
                     marginTop: "5px",
+                    overflow: "hidden",
                   }}
                 >
                   {point}
@@ -262,17 +287,21 @@ export async function GET(request: Request) {
               </div>
             </div>
 
-            {/* Premium kutusu */}
+            {/* Premium */}
             {premiumActive && (
               <div
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  marginTop: "12px",
+                  marginTop: "10px",
                   padding: "10px",
                   borderRadius: "11px",
                   background: "rgba(54, 50, 72, 0.92)",
                   border: "1px solid #836FFF",
+                  boxSizing: "border-box",
+                  width: "100%",
+                  minWidth: 0,
+                  overflow: "hidden",
                 }}
               >
                 <div
@@ -281,6 +310,7 @@ export async function GET(request: Request) {
                     alignItems: "center",
                     justifyContent: "space-between",
                     gap: "5px",
+                    minWidth: 0,
                   }}
                 >
                   <div
@@ -291,13 +321,10 @@ export async function GET(request: Request) {
                       fontSize: "16px",
                       fontWeight: 800,
                       color: remaining <= 3600 ? "#FBBF24" : "#C4B5FD",
+                      minWidth: 0,
                     }}
                   >
-                    <img
-                      src={emojis.premium}
-                      width="24"
-                      height="24"
-                    />
+                    <img src={emojis.premium} width="24" height="24" />
                     <span>
                       {remaining <= 3600 ? "Premium ⚠️" : "Premium"}
                     </span>
@@ -308,46 +335,46 @@ export async function GET(request: Request) {
                       display: "flex",
                       fontSize: "13px",
                       fontWeight: 700,
+                      flexShrink: 0,
                     }}
                   >
                     {formatDuration(remaining)}
                   </div>
                 </div>
 
-                <div
-                  style={{
-                    display: "flex",
-                    width: "100%",
-                    height: "10px",
-                    background: "#484456",
-                    borderRadius: "8px",
-                    overflow: "hidden",
-                    marginTop: "8px",
-                  }}
-                >
+                <div style={progressTrackStyle}>
                   <div
                     style={{
                       display: "flex",
                       width: `${premiumProgress}%`,
+                      maxWidth: "100%",
+                      minWidth: 0,
+                      boxSizing: "border-box",
                       height: "10px",
-                      background: remaining <= 3600 ? "#F59E0B" : "#A855F7",
+                      background:
+                        remaining <= 3600 ? "#F59E0B" : "#A855F7",
                       borderRadius: "8px",
+                      flexShrink: 0,
                     }}
                   />
                 </div>
               </div>
             )}
 
-            {/* Level ve XP: Premium'un hemen altında */}
+            {/* Level ve XP */}
             <div
               style={{
                 display: "flex",
                 flexDirection: "column",
                 marginTop: "10px",
                 padding: "10px",
+                boxSizing: "border-box",
+                width: "100%",
+                minWidth: 0,
                 borderRadius: "11px",
                 background: "rgba(54, 50, 72, 0.92)",
                 border: "1px solid #836FFF",
+                overflow: "hidden",
               }}
             >
               <div
@@ -358,6 +385,7 @@ export async function GET(request: Request) {
                   gap: "6px",
                   fontSize: "14px",
                   fontWeight: 700,
+                  minWidth: 0,
                 }}
               >
                 <div
@@ -365,6 +393,7 @@ export async function GET(request: Request) {
                     display: "flex",
                     alignItems: "center",
                     gap: "5px",
+                    minWidth: 0,
                   }}
                 >
                   <img src={emojis.level} width="22" height="22" />
@@ -376,6 +405,7 @@ export async function GET(request: Request) {
                     display: "flex",
                     alignItems: "center",
                     gap: "5px",
+                    minWidth: 0,
                   }}
                 >
                   <img src={emojis.xp} width="22" height="22" />
@@ -383,24 +413,18 @@ export async function GET(request: Request) {
                 </div>
               </div>
 
-              <div
-                style={{
-                  display: "flex",
-                  width: "100%",
-                  height: "10px",
-                  background: "#484456",
-                  borderRadius: "8px",
-                  overflow: "hidden",
-                  marginTop: "8px",
-                }}
-              >
+              <div style={progressTrackStyle}>
                 <div
                   style={{
                     display: "flex",
                     width: `${progress}%`,
+                    maxWidth: "100%",
+                    minWidth: 0,
+                    boxSizing: "border-box",
                     height: "10px",
                     background: barColor,
                     borderRadius: "8px",
+                    flexShrink: 0,
                   }}
                 />
               </div>
@@ -448,31 +472,24 @@ export async function GET(request: Request) {
             {[
               { label: "Seth", src: emojis.seth, value: seth },
               { label: "Yeth", src: emojis.yeth, value: yeth },
-              {
-                label: "SethBanka",
-                src: emojis.sethBanka,
-                value: sethBanka,
-              },
-              {
-                label: "Popülerlik",
-                src: emojis.popularity,
-                value: popularity,
-              },
+              { label: "SethBanka", src: emojis.sethBanka, value: sethBanka },
+              { label: "Popülerlik", src: emojis.popularity, value: popularity },
             ].map((item) => (
               <div key={item.label} style={cardStyle}>
                 <img
                   src={item.src}
                   width="27"
                   height="27"
-                  style={{ objectFit: "contain" }}
+                  style={{ objectFit: "contain", flexShrink: 0 }}
                 />
-                <span style={{ color: "#C4B5FD" }}>
+                <span style={{ color: "#C4B5FD", flexShrink: 0 }}>
                   {item.label}:
                 </span>
                 <span
                   style={{
                     display: "flex",
                     flex: 1,
+                    minWidth: 0,
                     justifyContent: "flex-end",
                     overflow: "hidden",
                     whiteSpace: "nowrap",
@@ -486,6 +503,6 @@ export async function GET(request: Request) {
         </div>
       </div>
     ),
-    { width: 1000, height: 400 }
+    { width: 1000, height: 460 }
   );
 }
