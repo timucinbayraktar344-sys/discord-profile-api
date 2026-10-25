@@ -16,11 +16,12 @@ export async function GET(request: Request) {
   const seth = searchParams.get("seth") || "0";
   const yeth = searchParams.get("yeth") || "0";
   const sethBanka = searchParams.get("sethbanka") || "0";
+  const popularity = searchParams.get("popularity") || "0";
 
   const ranked = searchParams.get("ranked") || "Unranked";
   const point = searchParams.get("point") || "0";
 
-  // Premium değerleri Unix timestamp (saniye)
+  // Premium timestamp değerleri saniye cinsindendir.
   const premiumEnd = Number(searchParams.get("premium") || 0);
   const premiumStart = Number(searchParams.get("premiumstart") || 0);
   const now = Math.floor(Date.now() / 1000);
@@ -31,7 +32,10 @@ export async function GET(request: Request) {
 
   const premiumProgress =
     premiumActive && totalDuration > 0
-      ? Math.max(0, Math.min(100, (remaining / totalDuration) * 100))
+      ? Math.max(
+          0,
+          Math.min(100, (remaining / totalDuration) * 100)
+        )
       : 0;
 
   const formatDuration = (seconds: number) => {
@@ -44,18 +48,17 @@ export async function GET(request: Request) {
     return `${minutes} dakika`;
   };
 
-  const premiumText = premiumActive
-    ? `${remaining <= 3600 ? "⚠️ " : ""}${formatDuration(remaining)}`
-    : "";
-
-  const progress = Math.min(100, Math.max(0, Math.round((xp / next) * 100)));
+  const progress = Math.min(
+    100,
+    Math.max(0, Math.round((xp / next) * 100))
+  );
 
   const barColor =
     level >= 100 ? "#facc15" :
     level >= 50 ? "#f97316" :
     level >= 25 ? "#ef4444" :
     level >= 10 ? "#3b82f6" :
-    "#836fff";
+    "#836FFF";
 
   const emojis = {
     logo: "https://cdn.discordapp.com/emojis/1363193225183105105.png?v=1&size=48&quality=lossless",
@@ -64,154 +67,431 @@ export async function GET(request: Request) {
     sethBanka: "https://cdn.discordapp.com/emojis/1328369378562932796.png?v=1&size=48&quality=lossless",
     xp: "https://cdn.discordapp.com/emojis/1355997317332734033.png?v=1&size=48&quality=lossless",
     level: "https://cdn.discordapp.com/emojis/1560926678723596379.png?v=1&size=48&quality=lossless",
+
+    // İstediğin yeni emojiler
+    premium: "https://cdn.discordapp.com/emojis/1221870403153166436.png?v=1&size=48&quality=lossless",
+    popularity: "https://cdn.discordapp.com/emojis/1221807792134946856.png?v=1&size=48&quality=lossless",
   };
+
+  const cardStyle = {
+    display: "flex",
+    alignItems: "center",
+    gap: "9px",
+    padding: "8px 11px",
+    marginBottom: "7px",
+    borderRadius: "11px",
+    background: "rgba(54, 50, 72, 0.92)",
+    border: "1px solid #514477",
+    fontSize: "17px",
+    fontWeight: 600,
+    minHeight: "40px",
+  } as const;
 
   return new ImageResponse(
     (
-      <div style={{
-        display: "flex", width: "100%", height: "100%",
-        padding: "20px", background: "#2b2d31",
-        color: "#ffffff", fontFamily: "Arial",
-      }}>
-        <div style={{
-          display: "flex", width: "100%", height: "100%",
-          border: "1px solid #41434a", borderRadius: "22px",
-          padding: "22px", alignItems: "center",
-        }}>
-          {/* SOL: Büyütülmüş avatar ve kullanıcı bilgileri */}
-          <div style={{
-            display: "flex", flexDirection: "column",
-            width: "44%", height: "100%",
-            justifyContent: "center", paddingRight: "18px",
-          }}>
-            {avatar.startsWith("https://") && (
-              <img src={avatar} width="170" height="170" style={{
-                borderRadius: "85px", border: "5px solid #836fff",
-                objectFit: "cover",
-              }} />
-            )}
+      <div
+        style={{
+          display: "flex",
+          width: "100%",
+          height: "100%",
+          padding: "15px",
+          background: "#17151f",
+          color: "#ffffff",
+          fontFamily: "Arial",
+          position: "relative",
+        }}
+      >
+        {/* Banner dış çerçevesi */}
+        <div
+          style={{
+            display: "flex",
+            width: "100%",
+            height: "100%",
+            boxSizing: "border-box",
+            border: "3px solid #836FFF",
+            borderRadius: "22px",
+            padding: "18px",
+            position: "relative",
+            overflow: "hidden",
+            background:
+              "linear-gradient(135deg, #242033 0%, #17151f 55%, #211b35 100%)",
+          }}
+        >
+          {/* Büyük, şeffaf arka plan yazısı */}
+          <div
+            style={{
+              display: "flex",
+              position: "absolute",
+              left: "205px",
+              top: "105px",
+              width: "740px",
+              height: "150px",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "100px",
+              fontWeight: 900,
+              color: "#FFFFFF",
+              opacity: 0.075,
+              whiteSpace: "nowrap",
+            }}
+          >
+            (S) SETH
+          </div>
 
-            <div style={{
-              display: "flex", fontSize: 29, fontWeight: 700,
-              marginTop: "10px", maxWidth: "370px",
-            }}>
-              {name}
+          {/* SOL: Avatar ve kullanıcı bilgileri */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              width: "43%",
+              height: "100%",
+              paddingRight: "16px",
+              borderRight: "1px solid #514477",
+              position: "relative",
+            }}
+          >
+            {/* Avatar ve isim yan yana */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "14px",
+                minHeight: "135px",
+              }}
+            >
+              {avatar.startsWith("https://") && (
+                <img
+                  src={avatar}
+                  width="128"
+                  height="128"
+                  style={{
+                    borderRadius: "64px",
+                    border: "4px solid #836FFF",
+                    objectFit: "cover",
+                    flexShrink: 0,
+                  }}
+                />
+              )}
+
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  flex: 1,
+                  minWidth: 0,
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    fontSize: "25px",
+                    fontWeight: 800,
+                    overflow: "hidden",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  {name}
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    fontSize: "13px",
+                    color: "#B9ACFF",
+                    marginTop: "5px",
+                  }}
+                >
+                  SETH PROFILE
+                </div>
+              </div>
             </div>
 
-            {/* Ranked / Point başlıkları büyütüldü */}
-            <div style={{
-              display: "flex", alignItems: "center", gap: "10px",
-              marginTop: "12px", fontSize: 23, fontWeight: 700,
-            }}>
-              <span>Ranked</span>
-              <span style={{ color: "#836fff" }}>&gt;</span>
-              <span>Point</span>
+            {/* Ranked ve Point eş tasarımlı kutular */}
+            <div
+              style={{
+                display: "flex",
+                gap: "8px",
+                marginTop: "14px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  flex: 1,
+                  padding: "9px",
+                  borderRadius: "11px",
+                  background: "rgba(54, 50, 72, 0.92)",
+                  border: "1px solid #836FFF",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    fontSize: "16px",
+                    fontWeight: 800,
+                    color: "#C4B5FD",
+                  }}
+                >
+                  Ranked
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    fontSize: "17px",
+                    fontWeight: 700,
+                    marginTop: "5px",
+                    overflow: "hidden",
+                  }}
+                >
+                  {ranked}
+                </div>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  flex: 1,
+                  padding: "9px",
+                  borderRadius: "11px",
+                  background: "rgba(54, 50, 72, 0.92)",
+                  border: "1px solid #836FFF",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    fontSize: "16px",
+                    fontWeight: 800,
+                    color: "#C4B5FD",
+                  }}
+                >
+                  Point
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    fontSize: "17px",
+                    fontWeight: 700,
+                    marginTop: "5px",
+                  }}
+                >
+                  {point}
+                </div>
+              </div>
             </div>
 
-            <div style={{
-              display: "flex", fontSize: 22, color: "#d1d5db",
-              marginTop: "5px", fontWeight: 600,
-            }}>
-              {ranked} • {point}
-            </div>
-
-            {/* Premium yalnızca aktifken görünür */}
+            {/* Premium sadece aktifken görünür */}
             {premiumActive && (
-              <div style={{
-                display: "flex", flexDirection: "column",
-                marginTop: "14px", width: "100%",
-              }}>
-                <div style={{
-                  display: "flex", alignItems: "center",
-                  justifyContent: "space-between", gap: "6px",
-                  fontSize: 17, fontWeight: 700,
-                }}>
-                  <span style={{ color: premiumWarningColor(remaining) }}>
-                    {remaining <= 3600 ? "⚠️ Premium" : "Premium"}
-                  </span>
-                  <span style={{ fontSize: 15 }}>{formatDuration(remaining)}</span>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  marginTop: "13px",
+                  padding: "10px",
+                  borderRadius: "11px",
+                  background: "rgba(54, 50, 72, 0.92)",
+                  border: "1px solid #836FFF",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "5px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      fontSize: "16px",
+                      fontWeight: 800,
+                      color: remaining <= 3600 ? "#FBBF24" : "#C4B5FD",
+                    }}
+                  >
+                    <img
+                      src={emojis.premium}
+                      width="24"
+                      height="24"
+                    />
+                    <span>
+                      {remaining <= 3600 ? "Premium ⚠️" : "Premium"}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      fontSize: "13px",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {formatDuration(remaining)}
+                  </div>
                 </div>
 
-                <div style={{
-                  display: "flex", width: "100%", height: "12px",
-                  background: "#484a53", borderRadius: "8px",
-                  overflow: "hidden", marginTop: "7px",
-                }}>
-                  <div style={{
-                    display: "flex", width: `${premiumProgress}%`,
-                    height: "12px",
-                    background: remaining <= 3600 ? "#f59e0b" : "#a855f7",
+                <div
+                  style={{
+                    display: "flex",
+                    width: "100%",
+                    height: "10px",
+                    background: "#484456",
                     borderRadius: "8px",
-                  }} />
+                    overflow: "hidden",
+                    marginTop: "8px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      width: `${premiumProgress}%`,
+                      height: "10px",
+                      background: remaining <= 3600 ? "#F59E0B" : "#A855F7",
+                      borderRadius: "8px",
+                    }}
+                  />
                 </div>
               </div>
             )}
           </div>
 
-          {/* SAĞ: Seth ve özel emoji listesi */}
-          <div style={{
-            display: "flex", flexDirection: "column", flex: 1,
-            height: "100%", justifyContent: "center",
-            paddingLeft: "22px", borderLeft: "1px solid #41434a",
-          }}>
-            <div style={{
-              display: "flex", alignItems: "center",
-              justifyContent: "center", gap: "12px",
-              marginBottom: "15px",
-            }}>
-              <img src={emojis.logo} width="48" height="48" style={{ objectFit: "contain" }} />
-              <div style={{
-                display: "flex", fontSize: 38, fontWeight: 800, color: "#836fff",
-              }}>Seth</div>
+          {/* SAĞ: Seth başlığı, ekonomi ve XP */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              flex: 1,
+              height: "100%",
+              paddingLeft: "18px",
+              position: "relative",
+            }}
+          >
+            {/* Seth başlığı */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                marginBottom: "12px",
+              }}
+            >
+              <img
+                src={emojis.logo}
+                width="40"
+                height="40"
+                style={{ objectFit: "contain" }}
+              />
+              <div
+                style={{
+                  display: "flex",
+                  fontSize: "35px",
+                  fontWeight: 900,
+                  color: "#A99AFF",
+                }}
+              >
+                Seth
+              </div>
             </div>
 
+            {/* Ekonomi kutuları */}
             {[
               { label: "Seth", src: emojis.seth, value: seth },
               { label: "Yeth", src: emojis.yeth, value: yeth },
               { label: "SethBanka", src: emojis.sethBanka, value: sethBanka },
+              {
+                label: "Popülerlik",
+                src: emojis.popularity,
+                value: popularity,
+              },
             ].map((item) => (
-              <div key={item.label} style={{
-                display: "flex", alignItems: "center", gap: "10px",
-                padding: "8px 12px", marginBottom: "7px",
-                borderRadius: "10px", background: "#36383e",
-                fontSize: 18, fontWeight: 600,
-              }}>
-                <img src={item.src} width="30" height="30" style={{ objectFit: "contain" }} />
-                <span>{item.label}:</span>
-                <span>{item.value}</span>
+              <div key={item.label} style={cardStyle}>
+                <img
+                  src={item.src}
+                  width="27"
+                  height="27"
+                  style={{ objectFit: "contain" }}
+                />
+                <span style={{ color: "#C4B5FD" }}>
+                  {item.label}:
+                </span>
+                <span
+                  style={{
+                    display: "flex",
+                    flex: 1,
+                    justifyContent: "flex-end",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {item.value}
+                </span>
               </div>
             ))}
 
             {/* Level ve XP */}
-            <div style={{
-              display: "flex", flexDirection: "column",
-              marginTop: "auto", paddingTop: "8px",
-            }}>
-              <div style={{
-                display: "flex", alignItems: "center",
-                justifyContent: "space-between", fontSize: 16,
-                fontWeight: 600, gap: "8px",
-              }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <img src={emojis.level} width="22" height="22" />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                marginTop: "auto",
+                paddingTop: "5px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  fontSize: "15px",
+                  fontWeight: 700,
+                  gap: "8px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}
+                >
+                  <img src={emojis.level} width="21" height="21" />
                   <span>Level {level}</span>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <img src={emojis.xp} width="22" height="22" />
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}
+                >
+                  <img src={emojis.xp} width="21" height="21" />
                   <span>{xp} / {next} XP</span>
                 </div>
               </div>
 
-              <div style={{
-                display: "flex", width: "100%", height: "10px",
-                background: "#484a53", borderRadius: "8px",
-                overflow: "hidden", marginTop: "8px",
-              }}>
-                <div style={{
-                  display: "flex", width: `${progress}%`,
-                  height: "10px", background: barColor,
+              <div
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  height: "10px",
+                  background: "#484456",
                   borderRadius: "8px",
-                }} />
+                  overflow: "hidden",
+                  marginTop: "7px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    width: `${progress}%`,
+                    height: "10px",
+                    background: barColor,
+                    borderRadius: "8px",
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -220,8 +500,4 @@ export async function GET(request: Request) {
     ),
     { width: 1000, height: 400 }
   );
-}
-
-function premiumWarningColor(remaining: number) {
-  return remaining <= 3600 ? "#f59e0b" : "#c4b5fd";
 }
