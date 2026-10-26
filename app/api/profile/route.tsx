@@ -12,20 +12,30 @@ export async function GET(request: Request) {
     searchParams.get("bio") || "Henüz biyografi eklenmedi"
   ).slice(0, 90);
 
-  const level = Math.max(0, Number(searchParams.get("level") || 1));
-  const xp = Math.max(0, Number(searchParams.get("xp") || 0));
-  const next = Math.max(1, Number(searchParams.get("next") || 100));
+  const parseNumber = (value: string | null, fallback = 0) => {
+    const parsed = Number((value || "").replace(/,/g, ""));
+    return Number.isFinite(parsed) ? parsed : fallback;
+  };
 
-  const seth = searchParams.get("seth") || "0";
-  const yeth = searchParams.get("yeth") || "0";
-  const sethBanka = searchParams.get("sethbanka") || "0";
-  const popularity = searchParams.get("popularity") || "0";
+  const formatNumber = (value: number) =>
+    new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: 0,
+    }).format(value);
+
+  const level = Math.max(0, parseNumber(searchParams.get("level"), 1));
+  const xp = Math.max(0, parseNumber(searchParams.get("xp")));
+  const next = Math.max(1, parseNumber(searchParams.get("next"), 100));
+
+  const seth = formatNumber(parseNumber(searchParams.get("seth")));
+  const yeth = formatNumber(parseNumber(searchParams.get("yeth")));
+  const sethBanka = formatNumber(parseNumber(searchParams.get("sethbanka")));
+  const popularity = formatNumber(parseNumber(searchParams.get("popularity")));
 
   const ranked = searchParams.get("ranked") || "Unranked";
-  const point = searchParams.get("point") || "0";
+  const point = formatNumber(parseNumber(searchParams.get("point")));
 
-  const premiumEnd = Number(searchParams.get("premium") || 0);
-  const premiumStart = Number(searchParams.get("premiumstart") || 0);
+  const premiumEnd = parseNumber(searchParams.get("premium"));
+  const premiumStart = parseNumber(searchParams.get("premiumstart"));
   const now = Math.floor(Date.now() / 1000);
 
   const premiumActive = premiumEnd > now;
@@ -77,8 +87,6 @@ export async function GET(request: Request) {
     padding: "8px 11px",
     marginBottom: "7px",
     borderRadius: "11px",
-    background: "rgba(54, 50, 72, 0.92)",
-    border: "1px solid #514477",
     fontSize: "17px",
     fontWeight: 600,
     minHeight: "40px",
@@ -98,6 +106,33 @@ export async function GET(request: Request) {
     marginTop: "8px",
   } as const;
 
+  const economyCards = [
+    {
+      label: "Seth",
+      src: emojis.seth,
+      value: seth,
+      color: "#836FFF",
+    },
+    {
+      label: "Yeth",
+      src: emojis.yeth,
+      value: yeth,
+      color: "#35C9FF",
+    },
+    {
+      label: "SethBanka",
+      src: emojis.sethBanka,
+      value: sethBanka,
+      color: "#FFFFFF",
+    },
+    {
+      label: "Popülerlik",
+      src: emojis.popularity,
+      value: popularity,
+      color: "#FF9F43",
+    },
+  ];
+
   return new ImageResponse(
     (
       <div
@@ -112,195 +147,278 @@ export async function GET(request: Request) {
           fontFamily: "Arial",
         }}
       >
+        {/* Dış çerçeve: Premium aktifken gökkuşağı */}
         <div
           style={{
             display: "flex",
             width: "100%",
             height: "100%",
+            padding: premiumActive ? "4px" : "3px",
             boxSizing: "border-box",
-            border: "3px solid #836FFF",
             borderRadius: "22px",
-            padding: "18px",
-            overflow: "hidden",
-            background:
-              "linear-gradient(135deg, #242033 0%, #17151f 55%, #211b35 100%)",
+            background: premiumActive
+              ? "linear-gradient(120deg, #ff3b7a, #ff9f43, #ffe66d, #39e58c, #35c9ff, #8b5cf6, #ff3b7a)"
+              : "#836FFF",
           }}
         >
-          {/* SOL: Profil bilgileri */}
+          {/* İç çerçeve */}
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
-              width: "43%",
+              width: "100%",
               height: "100%",
-              minWidth: 0,
-              paddingRight: "16px",
-              borderRight: "1px solid #514477",
+              boxSizing: "border-box",
+              borderRadius: "18px",
+              padding: "18px",
+              overflow: "hidden",
+              background: "linear-gradient(135deg, rgba(36, 32, 51, 0.58) 0%, rgba(23, 21, 31, 0.48) 55%, rgba(33, 27, 53, 0.58) 100%)",
             }}
           >
-            {/* Avatar, kullanıcı adı ve biyografi */}
+            {/* SOL: Profil bilgileri */}
             <div
               style={{
                 display: "flex",
-                alignItems: "flex-start",
-                gap: "12px",
-                minHeight: "115px",
-                paddingTop: "0px",
-                boxSizing: "border-box",
+                flexDirection: "column",
+                width: "43%",
+                height: "100%",
+                minWidth: 0,
+                paddingRight: "16px",
+                borderRight: "1px solid rgba(196, 181, 253, 0.35)",
               }}
             >
-              {avatar.startsWith("https://") && (
-                <img
-                  src={avatar}
-                  width="108"
-                  height="108"
+              {/* Avatar, kullanıcı adı ve biyografi */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "12px",
+                  minHeight: "115px",
+                  boxSizing: "border-box",
+                }}
+              >
+                {avatar.startsWith("https://") && (
+                  <img
+                    src={avatar}
+                    width="108"
+                    height="108"
+                    style={{
+                      borderRadius: "54px",
+                      border: "4px solid #836FFF",
+                      objectFit: "cover",
+                      flexShrink: 0,
+                    }}
+                  />
+                )}
+
+                <div
                   style={{
-                    borderRadius: "54px",
-                    border: "4px solid #836FFF",
-                    objectFit: "cover",
-                    flexShrink: 0,
+                    display: "flex",
+                    flexDirection: "column",
+                    flex: 1,
+                    minWidth: 0,
                   }}
-                />
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      fontSize: "24px",
+                      fontWeight: 800,
+                      lineHeight: 1.15,
+                      maxWidth: "100%",
+                      overflow: "hidden",
+                      overflowWrap: "anywhere",
+                    }}
+                  >
+                    {name}
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      fontSize: "14px",
+                      color: "#C4B5FD",
+                      marginTop: "5px",
+                      lineHeight: 1.5,
+                      overflow: "hidden",
+                      overflowWrap: "anywhere",
+                      wordBreak: "break-word",
+                      maxHeight: "126px",
+                    }}
+                  >
+                    {bio}
+                  </div>
+                </div>
+              </div>
+
+              {/* Ranked ve Point */}
+              <div
+                style={{
+                  display: "flex",
+                  gap: "8px",
+                  marginTop: "10px",
+                  minWidth: 0,
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    flex: 1,
+                    minWidth: 0,
+                    padding: "9px",
+                    borderRadius: "11px",
+                    background: "rgba(131, 111, 255, 0.16)",
+                    border: "1px solid rgba(131, 111, 255, 0.65)",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      fontSize: "16px",
+                      fontWeight: 800,
+                      color: "#C4B5FD",
+                    }}
+                  >
+                    Ranked
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      fontSize: "17px",
+                      fontWeight: 700,
+                      marginTop: "5px",
+                      overflow: "hidden",
+                      overflowWrap: "anywhere",
+                    }}
+                  >
+                    {ranked}
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    flex: 1,
+                    minWidth: 0,
+                    padding: "9px",
+                    borderRadius: "11px",
+                    background: "rgba(131, 111, 255, 0.16)",
+                    border: "1px solid rgba(131, 111, 255, 0.65)",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      fontSize: "16px",
+                      fontWeight: 800,
+                      color: "#C4B5FD",
+                    }}
+                  >
+                    Point
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      fontSize: "17px",
+                      fontWeight: 700,
+                      marginTop: "5px",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {point}
+                  </div>
+                </div>
+              </div>
+
+              {/* Premium */}
+              {premiumActive && (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    marginTop: "10px",
+                    padding: "10px",
+                    borderRadius: "11px",
+                    background: "rgba(168, 85, 247, 0.18)",
+                    border: "1px solid rgba(192, 132, 252, 0.75)",
+                    boxSizing: "border-box",
+                    width: "100%",
+                    minWidth: 0,
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: "5px",
+                      minWidth: 0,
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        fontSize: "16px",
+                        fontWeight: 800,
+                        color: remaining <= 3600 ? "#FBBF24" : "#C4B5FD",
+                        minWidth: 0,
+                      }}
+                    >
+                      <img src={emojis.premium} width="24" height="24" />
+                      <span>
+                        {remaining <= 3600 ? "Premium ⚠️" : "Premium"}
+                      </span>
+                    </div>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        fontSize: "13px",
+                        fontWeight: 700,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {formatDuration(remaining)}
+                    </div>
+                  </div>
+
+                  <div style={progressTrackStyle}>
+                    <div
+                      style={{
+                        display: "flex",
+                        width: `${premiumProgress}%`,
+                        maxWidth: "100%",
+                        minWidth: 0,
+                        boxSizing: "border-box",
+                        height: "10px",
+                        background: remaining <= 3600 ? "#F59E0B" : "#A855F7",
+                        borderRadius: "8px",
+                        flexShrink: 0,
+                      }}
+                    />
+                  </div>
+                </div>
               )}
 
+              {/* Level ve XP: biraz aşağı alındı */}
               <div
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  flex: 1,
-                  minWidth: 0,
-                  paddingTop: "0px",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    fontSize: "24px",
-                    fontWeight: 800,
-                    lineHeight: 1.15,
-                    maxWidth: "100%",
-                    overflow: "hidden",
-                    overflowWrap: "anywhere",
-                  }}
-                >
-                  {name}
-                </div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    fontSize: "14px",
-                    color: "#C4B5FD",
-                    marginTop: "5px",
-                    lineHeight: 1.5,
-                    overflow: "hidden",
-                    overflowWrap: "anywhere",
-                    wordBreak: "break-word",
-                    maxHeight: "126px",
-                  }}
-                >
-                  {bio}
-                </div>
-              </div>
-            </div>
-
-            {/* Ranked ve Point */}
-            <div
-              style={{
-                display: "flex",
-                gap: "8px",
-                marginTop: "10px",
-                minWidth: 0,
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  flex: 1,
-                  minWidth: 0,
-                  padding: "9px",
-                  borderRadius: "11px",
-                  background: "rgba(54, 50, 72, 0.92)",
-                  border: "1px solid #836FFF",
-                  boxSizing: "border-box",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    fontSize: "16px",
-                    fontWeight: 800,
-                    color: "#C4B5FD",
-                  }}
-                >
-                  Ranked
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    fontSize: "17px",
-                    fontWeight: 700,
-                    marginTop: "5px",
-                    overflow: "hidden",
-                    overflowWrap: "anywhere",
-                  }}
-                >
-                  {ranked}
-                </div>
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  flex: 1,
-                  minWidth: 0,
-                  padding: "9px",
-                  borderRadius: "11px",
-                  background: "rgba(54, 50, 72, 0.92)",
-                  border: "1px solid #836FFF",
-                  boxSizing: "border-box",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    fontSize: "16px",
-                    fontWeight: 800,
-                    color: "#C4B5FD",
-                  }}
-                >
-                  Point
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    fontSize: "17px",
-                    fontWeight: 700,
-                    marginTop: "5px",
-                    overflow: "hidden",
-                  }}
-                >
-                  {point}
-                </div>
-              </div>
-            </div>
-
-            {/* Premium */}
-            {premiumActive && (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  marginTop: "10px",
+                  marginTop: "18px",
                   padding: "10px",
-                  borderRadius: "11px",
-                  background: "rgba(54, 50, 72, 0.92)",
-                  border: "1px solid #836FFF",
                   boxSizing: "border-box",
                   width: "100%",
                   minWidth: 0,
+                  borderRadius: "11px",
+                  background: "rgba(131, 111, 255, 0.16)",
+                  border: "1px solid rgba(131, 111, 255, 0.65)",
                   overflow: "hidden",
                 }}
               >
@@ -309,7 +427,9 @@ export async function GET(request: Request) {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    gap: "5px",
+                    gap: "6px",
+                    fontSize: "14px",
+                    fontWeight: 700,
                     minWidth: 0,
                   }}
                 >
@@ -317,28 +437,26 @@ export async function GET(request: Request) {
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "6px",
-                      fontSize: "16px",
-                      fontWeight: 800,
-                      color: remaining <= 3600 ? "#FBBF24" : "#C4B5FD",
+                      gap: "5px",
                       minWidth: 0,
                     }}
                   >
-                    <img src={emojis.premium} width="24" height="24" />
-                    <span>
-                      {remaining <= 3600 ? "Premium ⚠️" : "Premium"}
-                    </span>
+                    <img src={emojis.level} width="22" height="22" />
+                    <span>Level {formatNumber(level)}</span>
                   </div>
 
                   <div
                     style={{
                       display: "flex",
-                      fontSize: "13px",
-                      fontWeight: 700,
-                      flexShrink: 0,
+                      alignItems: "center",
+                      gap: "5px",
+                      minWidth: 0,
                     }}
                   >
-                    {formatDuration(remaining)}
+                    <img src={emojis.xp} width="22" height="22" />
+                    <span>
+                      {formatNumber(xp)} / {formatNumber(next)} XP
+                    </span>
                   </div>
                 </div>
 
@@ -346,159 +464,96 @@ export async function GET(request: Request) {
                   <div
                     style={{
                       display: "flex",
-                      width: `${premiumProgress}%`,
+                      width: `${progress}%`,
                       maxWidth: "100%",
                       minWidth: 0,
                       boxSizing: "border-box",
                       height: "10px",
-                      background:
-                        remaining <= 3600 ? "#F59E0B" : "#A855F7",
+                      background: barColor,
                       borderRadius: "8px",
                       flexShrink: 0,
                     }}
                   />
                 </div>
               </div>
-            )}
+            </div>
 
-            {/* Level ve XP */}
+            {/* SAĞ: Seth ve renkli ekonomi kutuları */}
             <div
               style={{
                 display: "flex",
                 flexDirection: "column",
-                marginTop: "10px",
-                padding: "10px",
-                boxSizing: "border-box",
-                width: "100%",
+                flex: 1,
                 minWidth: 0,
-                borderRadius: "11px",
-                background: "rgba(54, 50, 72, 0.92)",
-                border: "1px solid #836FFF",
-                overflow: "hidden",
+                height: "100%",
+                paddingLeft: "18px",
               }}
             >
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: "6px",
-                  fontSize: "14px",
-                  fontWeight: 700,
-                  minWidth: 0,
+                  justifyContent: "center",
+                  gap: "10px",
+                  marginBottom: "12px",
                 }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "5px",
-                    minWidth: 0,
-                  }}
-                >
-                  <img src={emojis.level} width="22" height="22" />
-                  <span>Level {level}</span>
-                </div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "5px",
-                    minWidth: 0,
-                  }}
-                >
-                  <img src={emojis.xp} width="22" height="22" />
-                  <span>{xp} / {next} XP</span>
-                </div>
-              </div>
-
-              <div style={progressTrackStyle}>
-                <div
-                  style={{
-                    display: "flex",
-                    width: `${progress}%`,
-                    maxWidth: "100%",
-                    minWidth: 0,
-                    boxSizing: "border-box",
-                    height: "10px",
-                    background: barColor,
-                    borderRadius: "8px",
-                    flexShrink: 0,
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* SAĞ: Seth ve ekonomi kutuları */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              flex: 1,
-              minWidth: 0,
-              height: "100%",
-              paddingLeft: "18px",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "10px",
-                marginBottom: "12px",
-              }}
-            >
-              <img
-                src={emojis.logo}
-                width="40"
-                height="40"
-                style={{ objectFit: "contain" }}
-              />
-              <div
-                style={{
-                  display: "flex",
-                  fontSize: "35px",
-                  fontWeight: 900,
-                  color: "#A99AFF",
-                }}
-              >
-                Seth
-              </div>
-            </div>
-
-            {[
-              { label: "Seth", src: emojis.seth, value: seth },
-              { label: "Yeth", src: emojis.yeth, value: yeth },
-              { label: "SethBanka", src: emojis.sethBanka, value: sethBanka },
-              { label: "Popülerlik", src: emojis.popularity, value: popularity },
-            ].map((item) => (
-              <div key={item.label} style={cardStyle}>
                 <img
-                  src={item.src}
-                  width="27"
-                  height="27"
-                  style={{ objectFit: "contain", flexShrink: 0 }}
+                  src={emojis.logo}
+                  width="40"
+                  height="40"
+                  style={{ objectFit: "contain" }}
                 />
-                <span style={{ color: "#C4B5FD", flexShrink: 0 }}>
-                  {item.label}:
-                </span>
-                <span
+                <div
                   style={{
                     display: "flex",
-                    flex: 1,
-                    minWidth: 0,
-                    justifyContent: "flex-end",
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
+                    fontSize: "35px",
+                    fontWeight: 900,
+                    color: "#A99AFF",
                   }}
                 >
-                  {item.value}
-                </span>
+                  Seth
+                </div>
               </div>
-            ))}
+
+              {economyCards.map((item) => (
+                <div
+                  key={item.label}
+                  style={{
+                    ...cardStyle,
+                    background: `${item.color}22`,
+                    border: `1px solid ${item.color}99`,
+                  }}
+                >
+                  <img
+                    src={item.src}
+                    width="27"
+                    height="27"
+                    style={{ objectFit: "contain", flexShrink: 0 }}
+                  />
+                  <span
+                    style={{
+                      color: item.color === "#FFFFFF" ? "#FFFFFF" : item.color,
+                      flexShrink: 0,
+                    }}
+                  >
+                    {item.label}:
+                  </span>
+                  <span
+                    style={{
+                      display: "flex",
+                      flex: 1,
+                      minWidth: 0,
+                      justifyContent: "flex-end",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {item.value}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
