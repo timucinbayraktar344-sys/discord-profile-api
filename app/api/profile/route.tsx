@@ -84,6 +84,44 @@ export async function GET(request: Request) {
     popularity: "https://cdn.discordapp.com/emojis/1221807792134946856.png?v=1&size=48&quality=lossless",
   };
 
+  // Rütbe emojileri
+  const rankEmojis = {
+    premium: [
+      "https://cdn.discordapp.com/emojis/1396893700247912489.png?v=1&size=48&quality=lossless",
+      "https://cdn.discordapp.com/emojis/1396893718241345596.png?v=1&size=48&quality=lossless",
+      "https://cdn.discordapp.com/emojis/1396893733508874333.png?v=1&size=48&quality=lossless",
+      "https://cdn.discordapp.com/emojis/1396893749266878665.png?v=1&size=48&quality=lossless",
+    ],
+    kullanici: [
+      "https://cdn.discordapp.com/emojis/1396893340682817688.png?v=1&size=48&quality=lossless",
+      "https://cdn.discordapp.com/emojis/1396893386597994497.png?v=1&size=48&quality=lossless",
+      "https://cdn.discordapp.com/emojis/1396893409310015639.png?v=1&size=48&quality=lossless",
+      "https://cdn.discordapp.com/emojis/1396893427127554048.png?v=1&size=48&quality=lossless",
+      "https://cdn.discordapp.com/emojis/1396893445066588231.png?v=1&size=48&quality=lossless",
+    ],
+    kurucu: [
+      "https://cdn.discordapp.com/emojis/1396894525867430079.png?v=1&size=48&quality=lossless",
+      "https://cdn.discordapp.com/emojis/1396894510763606047.png?v=1&size=48&quality=lossless",
+      "https://cdn.discordapp.com/emojis/1396894541101137990.png?v=1&size=48&quality=lossless",
+      "https://cdn.discordapp.com/emojis/1396894555806236722.png?v=1&size=48&quality=lossless",
+    ],
+  };
+
+  const normalizedRank = ranked
+    .toLocaleLowerCase("tr-TR")
+    .replaceAll("ı", "i")
+    .trim();
+
+  const rankEmoji = normalizedRank.includes("premium")
+    ? rankEmojis.premium[0]
+    : normalizedRank.includes("kurucu")
+      ? rankEmojis.kurucu[0]
+      : normalizedRank.includes("kullanici") ||
+          normalizedRank.includes("user") ||
+          normalizedRank.includes("unranked")
+        ? rankEmojis.kullanici[0]
+        : null;
+
   const cardStyle = {
     display: "flex",
     alignItems: "center",
@@ -112,7 +150,7 @@ export async function GET(request: Request) {
 
   const economyCards = [
     { label: "Seth", src: emojis.seth, value: seth, color: "#836FFF" },
-    { label: "Yeth", src: emojis.yeth, value: yeth, color: "#5097DD" },
+    { label: "Yeth", src: emojis.yeth, value: yeth, color: "#35C9FF" },
     { label: "SethBanka", src: emojis.sethBanka, value: sethBanka, color: "#FFFFFF" },
     { label: "Popülerlik", src: emojis.popularity, value: popularity, color: "#FF9F43" },
   ];
@@ -131,7 +169,6 @@ export async function GET(request: Request) {
           fontFamily: "Arial",
         }}
       >
-        {/* Premium aktif olsa da iç tema sabit kalır */}
         <div
           style={{
             display: "flex",
@@ -169,7 +206,7 @@ export async function GET(request: Request) {
                 borderRight: "1px solid rgba(255,255,255,0.20)",
               }}
             >
-              {/* Avatar ve biyografi */}
+              {/* Avatar ve isim */}
               <div
                 style={{
                   display: "flex",
@@ -204,6 +241,9 @@ export async function GET(request: Request) {
                   <div
                     style={{
                       display: "flex",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      gap: "6px",
                       fontSize: "24px",
                       fontWeight: 800,
                       lineHeight: 1.15,
@@ -212,7 +252,15 @@ export async function GET(request: Request) {
                       overflowWrap: "anywhere",
                     }}
                   >
-                    {name}
+                    <span>{name}</span>
+                    {rankEmoji && (
+                      <img
+                        src={rankEmoji}
+                        width="27"
+                        height="27"
+                        style={{ objectFit: "contain", flexShrink: 0 }}
+                      />
+                    )}
                   </div>
 
                   <div
@@ -286,7 +334,7 @@ export async function GET(request: Request) {
                 ))}
               </div>
 
-              {/* Premium kutusu yalnızca aktifken görünür */}
+              {/* Premium kutusu */}
               {premiumActive && (
                 <div
                   style={{
@@ -359,7 +407,7 @@ export async function GET(request: Request) {
                 </div>
               )}
 
-              {/* Level ve XP biraz aşağıda */}
+              {/* Level ve XP */}
               <div
                 style={{
                   display: "flex",
@@ -484,12 +532,7 @@ export async function GET(request: Request) {
                     height="27"
                     style={{ objectFit: "contain", flexShrink: 0 }}
                   />
-                  <span
-                    style={{
-                      color: item.color,
-                      flexShrink: 0,
-                    }}
-                  >
+                  <span style={{ color: item.color, flexShrink: 0 }}>
                     {item.label}:
                   </span>
                   <span
