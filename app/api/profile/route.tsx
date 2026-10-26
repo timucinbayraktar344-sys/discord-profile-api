@@ -48,13 +48,17 @@ export async function GET(request: Request) {
       : 0;
 
   const formatDuration = (seconds: number) => {
-    const days = Math.floor(seconds / 86400);
-    const hours = Math.floor((seconds % 86400) / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
+    const safeSeconds = Math.max(0, Math.floor(seconds));
+    const days = Math.floor(safeSeconds / 86400);
+    const hours = Math.floor((safeSeconds % 86400) / 3600);
+    const minutes = Math.floor((safeSeconds % 3600) / 60);
+    const secs = safeSeconds % 60;
 
     if (days > 0) return `${days} gün ${hours} saat`;
     if (hours > 0) return `${hours} saat ${minutes} dakika`;
-    return `${minutes} dakika`;
+    if (minutes > 0 && secs > 0) return `${minutes} dakika ${secs} saniye`;
+    if (minutes > 0) return `${minutes} dakika`;
+    return `${secs} saniye`;
   };
 
   const progress = Math.min(
@@ -100,37 +104,17 @@ export async function GET(request: Request) {
     minWidth: 0,
     boxSizing: "border-box",
     height: "10px",
-    background: "#484456",
+    background: "#484848",
     borderRadius: "8px",
     overflow: "hidden",
     marginTop: "8px",
   } as const;
 
   const economyCards = [
-    {
-      label: "Seth",
-      src: emojis.seth,
-      value: seth,
-      color: "#836FFF",
-    },
-    {
-      label: "Yeth",
-      src: emojis.yeth,
-      value: yeth,
-      color: "#35C9FF",
-    },
-    {
-      label: "SethBanka",
-      src: emojis.sethBanka,
-      value: sethBanka,
-      color: "#FFFFFF",
-    },
-    {
-      label: "Popülerlik",
-      src: emojis.popularity,
-      value: popularity,
-      color: "#FF9F43",
-    },
+    { label: "Seth", src: emojis.seth, value: seth, color: "#836FFF" },
+    { label: "Yeth", src: emojis.yeth, value: yeth, color: "#35C9FF" },
+    { label: "SethBanka", src: emojis.sethBanka, value: sethBanka, color: "#FFFFFF" },
+    { label: "Popülerlik", src: emojis.popularity, value: popularity, color: "#FF9F43" },
   ];
 
   return new ImageResponse(
@@ -142,12 +126,12 @@ export async function GET(request: Request) {
           height: "100%",
           padding: "15px",
           boxSizing: "border-box",
-          background: "#17151f",
-          color: "#ffffff",
+          background: "#2B2B2B",
+          color: "#FFFFFF",
           fontFamily: "Arial",
         }}
       >
-        {/* Dış çerçeve: Premium aktifken gökkuşağı */}
+        {/* Premium aktif olsa da iç tema sabit kalır */}
         <div
           style={{
             display: "flex",
@@ -161,7 +145,6 @@ export async function GET(request: Request) {
               : "#836FFF",
           }}
         >
-          {/* İç çerçeve */}
           <div
             style={{
               display: "flex",
@@ -171,7 +154,7 @@ export async function GET(request: Request) {
               borderRadius: "18px",
               padding: "18px",
               overflow: "hidden",
-              background: "linear-gradient(135deg, rgba(36, 32, 51, 0.58) 0%, rgba(23, 21, 31, 0.48) 55%, rgba(33, 27, 53, 0.58) 100%)",
+              background: "linear-gradient(135deg, #303030 0%, #242424 55%, #353535 100%)",
             }}
           >
             {/* SOL: Profil bilgileri */}
@@ -183,10 +166,10 @@ export async function GET(request: Request) {
                 height: "100%",
                 minWidth: 0,
                 paddingRight: "16px",
-                borderRight: "1px solid rgba(196, 181, 253, 0.35)",
+                borderRight: "1px solid rgba(255,255,255,0.20)",
               }}
             >
-              {/* Avatar, kullanıcı adı ve biyografi */}
+              {/* Avatar ve biyografi */}
               <div
                 style={{
                   display: "flex",
@@ -236,7 +219,7 @@ export async function GET(request: Request) {
                     style={{
                       display: "flex",
                       fontSize: "14px",
-                      color: "#C4B5FD",
+                      color: "#D0D0D0",
                       marginTop: "5px",
                       lineHeight: 1.5,
                       overflow: "hidden",
@@ -259,81 +242,51 @@ export async function GET(request: Request) {
                   minWidth: 0,
                 }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    flex: 1,
-                    minWidth: 0,
-                    padding: "9px",
-                    borderRadius: "11px",
-                    background: "rgba(131, 111, 255, 0.16)",
-                    border: "1px solid rgba(131, 111, 255, 0.65)",
-                    boxSizing: "border-box",
-                  }}
-                >
+                {[
+                  { label: "Ranked", value: ranked },
+                  { label: "Point", value: point },
+                ].map((item) => (
                   <div
+                    key={item.label}
                     style={{
                       display: "flex",
-                      fontSize: "16px",
-                      fontWeight: 800,
-                      color: "#C4B5FD",
+                      flexDirection: "column",
+                      flex: 1,
+                      minWidth: 0,
+                      padding: "9px",
+                      borderRadius: "11px",
+                      background: "rgba(131,111,255,0.12)",
+                      border: "1px solid rgba(131,111,255,0.55)",
+                      boxSizing: "border-box",
                     }}
                   >
-                    Ranked
+                    <div
+                      style={{
+                        display: "flex",
+                        fontSize: "16px",
+                        fontWeight: 800,
+                        color: "#C4C4C4",
+                      }}
+                    >
+                      {item.label}
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        fontSize: "17px",
+                        fontWeight: 700,
+                        marginTop: "5px",
+                        overflow: "hidden",
+                        overflowWrap: "anywhere",
+                      }}
+                    >
+                      {item.value}
+                    </div>
                   </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      fontSize: "17px",
-                      fontWeight: 700,
-                      marginTop: "5px",
-                      overflow: "hidden",
-                      overflowWrap: "anywhere",
-                    }}
-                  >
-                    {ranked}
-                  </div>
-                </div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    flex: 1,
-                    minWidth: 0,
-                    padding: "9px",
-                    borderRadius: "11px",
-                    background: "rgba(131, 111, 255, 0.16)",
-                    border: "1px solid rgba(131, 111, 255, 0.65)",
-                    boxSizing: "border-box",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      fontSize: "16px",
-                      fontWeight: 800,
-                      color: "#C4B5FD",
-                    }}
-                  >
-                    Point
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      fontSize: "17px",
-                      fontWeight: 700,
-                      marginTop: "5px",
-                      overflow: "hidden",
-                    }}
-                  >
-                    {point}
-                  </div>
-                </div>
+                ))}
               </div>
 
-              {/* Premium */}
+              {/* Premium kutusu yalnızca aktifken görünür */}
               {premiumActive && (
                 <div
                   style={{
@@ -342,8 +295,8 @@ export async function GET(request: Request) {
                     marginTop: "10px",
                     padding: "10px",
                     borderRadius: "11px",
-                    background: "rgba(168, 85, 247, 0.18)",
-                    border: "1px solid rgba(192, 132, 252, 0.75)",
+                    background: "rgba(168,85,247,0.12)",
+                    border: "1px solid rgba(192,132,252,0.55)",
                     boxSizing: "border-box",
                     width: "100%",
                     minWidth: 0,
@@ -366,7 +319,7 @@ export async function GET(request: Request) {
                         gap: "6px",
                         fontSize: "16px",
                         fontWeight: 800,
-                        color: remaining <= 3600 ? "#FBBF24" : "#C4B5FD",
+                        color: remaining <= 3600 ? "#FBBF24" : "#D8C8FF",
                         minWidth: 0,
                       }}
                     >
@@ -406,7 +359,7 @@ export async function GET(request: Request) {
                 </div>
               )}
 
-              {/* Level ve XP: biraz aşağı alındı */}
+              {/* Level ve XP biraz aşağıda */}
               <div
                 style={{
                   display: "flex",
@@ -417,8 +370,8 @@ export async function GET(request: Request) {
                   width: "100%",
                   minWidth: 0,
                   borderRadius: "11px",
-                  background: "rgba(131, 111, 255, 0.16)",
-                  border: "1px solid rgba(131, 111, 255, 0.65)",
+                  background: "rgba(131,111,255,0.12)",
+                  border: "1px solid rgba(131,111,255,0.55)",
                   overflow: "hidden",
                 }}
               >
@@ -478,7 +431,7 @@ export async function GET(request: Request) {
               </div>
             </div>
 
-            {/* SAĞ: Seth ve renkli ekonomi kutuları */}
+            {/* SAĞ: Ekonomi kutuları */}
             <div
               style={{
                 display: "flex",
@@ -509,7 +462,7 @@ export async function GET(request: Request) {
                     display: "flex",
                     fontSize: "35px",
                     fontWeight: 900,
-                    color: "#A99AFF",
+                    color: "#D0D0D0",
                   }}
                 >
                   Seth
@@ -533,7 +486,7 @@ export async function GET(request: Request) {
                   />
                   <span
                     style={{
-                      color: item.color === "#FFFFFF" ? "#FFFFFF" : item.color,
+                      color: item.color,
                       flexShrink: 0,
                     }}
                   >
