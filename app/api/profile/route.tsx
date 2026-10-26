@@ -106,18 +106,20 @@ export async function GET(request: Request) {
     ],
   };
 
-  // Rutbe değişkeni, API'ye ranked parametresi olarak gönderiliyor.
-  const rutbe = searchParams.get("rutbe") || "Kullanıcı";
+  // BDFD'den gelen Rutbe değişkenini "rutbe" parametresinden oku.
+  const rutbe = searchParams.get("rutbe") || ranked;
 
+  // Büyük/küçük harf ve Türkçe ı/i farklılıklarını normalize et.
   const normalizedRank = rutbe
     .toLocaleLowerCase("tr-TR")
     .replaceAll("ı", "i")
     .trim();
 
-  const rankEmoji = normalizedRank.includes("premium")
-    ? rankEmojis.premium[0]
-    : normalizedRank.includes("kurucu")
-      ? rankEmojis.kurucu[0]
+  // Önce Kurucu kontrol edilir, sonra Premium, diğerleri Kullanıcı olur.
+  const rankEmoji = normalizedRank.includes("kurucu")
+    ? rankEmojis.kurucu[0]
+    : normalizedRank.includes("premium")
+      ? rankEmojis.premium[0]
       : rankEmojis.kullanici[0];
 
   const cardStyle = {
@@ -277,7 +279,7 @@ export async function GET(request: Request) {
                 </div>
               </div>
 
-              {/* Ranked ve Point: Tasarım aynı bırakıldı */}
+              {/* Ranked ve Point kutuları */}
               <div
                 style={{
                   display: "flex",
