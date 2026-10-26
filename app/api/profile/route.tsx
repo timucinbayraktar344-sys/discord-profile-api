@@ -112,7 +112,7 @@ export async function GET(request: Request) {
 
   const economyCards = [
     { label: "Seth", src: emojis.seth, value: seth, color: "#836FFF" },
-    { label: "Yeth", src: emojis.yeth, value: yeth, color: "#35C9FF" },
+    { label: "Yeth", src: emojis.yeth, value: yeth, color: "#5097DD" },
     { label: "SethBanka", src: emojis.sethBanka, value: sethBanka, color: "#FFFFFF" },
     { label: "Popülerlik", src: emojis.popularity, value: popularity, color: "#FF9F43" },
   ];
