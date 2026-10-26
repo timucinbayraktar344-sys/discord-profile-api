@@ -32,6 +32,7 @@ export async function GET(request: Request) {
   const popularity = formatNumber(parseNumber(searchParams.get("popularity")));
 
   const ranked = searchParams.get("ranked") || "Unranked";
+  const rutbe = searchParams.get("rutbe") || "Kullanıcı";
   const point = formatNumber(parseNumber(searchParams.get("point")));
 
   const premiumEnd = parseNumber(searchParams.get("premium"));
@@ -106,21 +107,16 @@ export async function GET(request: Request) {
     ],
   };
 
-  // BDFD'den gelen Rutbe değişkenini "rutbe" parametresinden oku.
-  const rutbe = searchParams.get("rutbe") || ranked;
-
-  // Büyük/küçük harf ve Türkçe ı/i farklılıklarını normalize et.
   const normalizedRank = rutbe
     .toLocaleLowerCase("tr-TR")
     .replaceAll("ı", "i")
     .trim();
 
-  // Önce Kurucu kontrol edilir, sonra Premium, diğerleri Kullanıcı olur.
-  const rankEmoji = normalizedRank.includes("kurucu")
-    ? rankEmojis.kurucu[0]
+  const rankEmojiList = normalizedRank.includes("kurucu")
+    ? rankEmojis.kurucu
     : normalizedRank.includes("premium")
-      ? rankEmojis.premium[0]
-      : rankEmojis.kullanici[0];
+      ? rankEmojis.premium
+      : rankEmojis.kullanici;
 
   const cardStyle = {
     display: "flex",
@@ -238,27 +234,44 @@ export async function GET(request: Request) {
                     minWidth: 0,
                   }}
                 >
+                  {/* İsim ve rütbeye ait tüm emojiler */}
                   <div
                     style={{
                       display: "flex",
                       alignItems: "center",
                       flexWrap: "wrap",
-                      gap: "6px",
+                      gap: "5px",
                       fontSize: "24px",
                       fontWeight: 800,
-                      lineHeight: 1.15,
+                      lineHeight: 1.25,
                       maxWidth: "100%",
-                      overflow: "hidden",
-                      overflowWrap: "anywhere",
+                      minWidth: 0,
+                      overflow: "visible",
                     }}
                   >
-                    <span>{name}</span>
-                    <img
-                      src={rankEmoji}
-                      width="27"
-                      height="27"
-                      style={{ objectFit: "contain", flexShrink: 0 }}
-                    />
+                    <span
+                      style={{
+                        overflowWrap: "anywhere",
+                        minWidth: 0,
+                      }}
+                    >
+                      {name}
+                    </span>
+
+                    {rankEmojiList.map((emoji, index) => (
+                      <img
+                        key={`${normalizedRank}-${index}`}
+                        src={emoji}
+                        width="27"
+                        height="27"
+                        style={{
+                          width: "27px",
+                          height: "27px",
+                          objectFit: "contain",
+                          flexShrink: 0,
+                        }}
+                      />
+                    ))}
                   </div>
 
                   <div
