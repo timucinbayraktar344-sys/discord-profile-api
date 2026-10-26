@@ -84,7 +84,6 @@ export async function GET(request: Request) {
     popularity: "https://cdn.discordapp.com/emojis/1221807792134946856.png?v=1&size=48&quality=lossless",
   };
 
-  // Rütbe emojileri
   const rankEmojis = {
     premium: [
       "https://cdn.discordapp.com/emojis/1396893700247912489.png?v=1&size=48&quality=lossless",
@@ -107,7 +106,10 @@ export async function GET(request: Request) {
     ],
   };
 
-  const normalizedRank = ranked
+  // Rutbe değişkeni, API'ye ranked parametresi olarak gönderiliyor.
+  const rutbe = searchParams.get("ranked") || "Kullanıcı";
+
+  const normalizedRank = rutbe
     .toLocaleLowerCase("tr-TR")
     .replaceAll("ı", "i")
     .trim();
@@ -116,11 +118,7 @@ export async function GET(request: Request) {
     ? rankEmojis.premium[0]
     : normalizedRank.includes("kurucu")
       ? rankEmojis.kurucu[0]
-      : normalizedRank.includes("kullanici") ||
-          normalizedRank.includes("user") ||
-          normalizedRank.includes("unranked")
-        ? rankEmojis.kullanici[0]
-        : null;
+      : rankEmojis.kullanici[0];
 
   const cardStyle = {
     display: "flex",
@@ -150,7 +148,7 @@ export async function GET(request: Request) {
 
   const economyCards = [
     { label: "Seth", src: emojis.seth, value: seth, color: "#836FFF" },
-    { label: "Yeth", src: emojis.yeth, value: yeth, color: "#35C9FF" },
+    { label: "Yeth", src: emojis.yeth, value: yeth, color: "#5097DD" },
     { label: "SethBanka", src: emojis.sethBanka, value: sethBanka, color: "#FFFFFF" },
     { label: "Popülerlik", src: emojis.popularity, value: popularity, color: "#FF9F43" },
   ];
@@ -253,14 +251,12 @@ export async function GET(request: Request) {
                     }}
                   >
                     <span>{name}</span>
-                    {rankEmoji && (
-                      <img
-                        src={rankEmoji}
-                        width="27"
-                        height="27"
-                        style={{ objectFit: "contain", flexShrink: 0 }}
-                      />
-                    )}
+                    <img
+                      src={rankEmoji}
+                      width="27"
+                      height="27"
+                      style={{ objectFit: "contain", flexShrink: 0 }}
+                    />
                   </div>
 
                   <div
@@ -281,7 +277,7 @@ export async function GET(request: Request) {
                 </div>
               </div>
 
-              {/* Ranked ve Point */}
+              {/* Ranked ve Point: Tasarım aynı bırakıldı */}
               <div
                 style={{
                   display: "flex",
