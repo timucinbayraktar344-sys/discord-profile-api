@@ -100,8 +100,8 @@ export async function GET(request: Request) {
       "https://cdn.discordapp.com/emojis/1396893445066588231.png?v=1&size=48&quality=lossless",
     ],
     kurucu: [
-      "https://cdn.discordapp.com/emojis/1396894525867430079.png?v=1&size=48&quality=lossless",
       "https://cdn.discordapp.com/emojis/1396894510763606047.png?v=1&size=48&quality=lossless",
+      "https://cdn.discordapp.com/emojis/1396894525867430079.png?v=1&size=48&quality=lossless",
       "https://cdn.discordapp.com/emojis/1396894541101137990.png?v=1&size=48&quality=lossless",
       "https://cdn.discordapp.com/emojis/1396894555806236722.png?v=1&size=48&quality=lossless",
     ],
@@ -130,6 +130,7 @@ export async function GET(request: Request) {
     minHeight: "40px",
     boxSizing: "border-box",
     minWidth: 0,
+    overflow: "hidden",
   } as const;
 
   const progressTrackStyle = {
@@ -145,10 +146,30 @@ export async function GET(request: Request) {
   } as const;
 
   const economyCards = [
-    { label: "Seth", src: emojis.seth, value: seth, color: "#836FFF" },
-    { label: "Yeth", src: emojis.yeth, value: yeth, color: "#5097DD" },
-    { label: "SethBanka", src: emojis.sethBanka, value: sethBanka, color: "#FFFFFF" },
-    { label: "Popülerlik", src: emojis.popularity, value: popularity, color: "#FF9F43" },
+    {
+      label: "Seth",
+      src: emojis.seth,
+      value: seth,
+      color: "#836FFF",
+    },
+    {
+      label: "Yeth",
+      src: emojis.yeth,
+      value: yeth,
+      color: "#5097DD",
+    },
+    {
+      label: "SethBanka",
+      src: emojis.sethBanka,
+      value: sethBanka,
+      color: "#D0D0D0",
+    },
+    {
+      label: "Popülerlik",
+      src: emojis.popularity,
+      value: popularity,
+      color: "#FF9F43",
+    },
   ];
 
   return new ImageResponse(
@@ -234,13 +255,12 @@ export async function GET(request: Request) {
                     minWidth: 0,
                   }}
                 >
-                  {/* İsim ve rütbeye ait tüm emojiler */}
                   <div
                     style={{
                       display: "flex",
                       alignItems: "center",
                       flexWrap: "wrap",
-                      gap: "5px",
+                      gap: "0px",
                       fontSize: "24px",
                       fontWeight: 800,
                       lineHeight: 1.25,
@@ -269,6 +289,8 @@ export async function GET(request: Request) {
                           height: "27px",
                           objectFit: "contain",
                           flexShrink: 0,
+                          margin: 0,
+                          padding: 0,
                         }}
                       />
                     ))}
@@ -533,8 +555,8 @@ export async function GET(request: Request) {
                   key={item.label}
                   style={{
                     ...cardStyle,
-                    background: `${item.color}22`,
-                    border: `1px solid ${item.color}99`,
+                    background: `linear-gradient(90deg, ${item.color}55 0%, ${item.color}30 45%, ${item.color}0D 100%)`,
+                    border: `1px solid ${item.color}88`,
                   }}
                 >
                   <img
@@ -543,9 +565,11 @@ export async function GET(request: Request) {
                     height="27"
                     style={{ objectFit: "contain", flexShrink: 0 }}
                   />
+
                   <span style={{ color: item.color, flexShrink: 0 }}>
                     {item.label}:
                   </span>
+
                   <span
                     style={{
                       display: "flex",
