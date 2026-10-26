@@ -107,7 +107,7 @@ export async function GET(request: Request) {
   };
 
   // Rutbe değişkeni, API'ye ranked parametresi olarak gönderiliyor.
-  const rutbe = searchParams.get("ranked") || "Kullanıcı";
+  const rutbe = searchParams.get("rutbe") || "Kullanıcı";
 
   const normalizedRank = rutbe
     .toLocaleLowerCase("tr-TR")
