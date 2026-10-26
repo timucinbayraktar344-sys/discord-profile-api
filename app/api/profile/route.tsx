@@ -123,7 +123,7 @@ export async function GET(request: Request) {
     alignItems: "center",
     gap: "9px",
     padding: "8px 11px",
-    marginBottom: "7px",
+    marginBottom: "12px",
     borderRadius: "11px",
     fontSize: "17px",
     fontWeight: 600,
@@ -255,6 +255,7 @@ export async function GET(request: Request) {
                     minWidth: 0,
                   }}
                 >
+                  {/* İsim ve bitişik rütbe emojileri */}
                   <div
                     style={{
                       display: "flex",
@@ -273,6 +274,7 @@ export async function GET(request: Request) {
                       style={{
                         overflowWrap: "anywhere",
                         minWidth: 0,
+                        marginRight: "6px",
                       }}
                     >
                       {name}
